@@ -13,10 +13,7 @@ def read_samples_from_bm_data():
     all_temperature = []
     for filename in filenames:
         with open(file=join(data_files_path, filename), mode="r", encoding = "utf-8") as file:
-            data = file.read(-1).replace("'","\"").replace("\n", "")
-            temperature_string = data[data.find("temperature"):]
-            all_temperature.append(int(temperature_string.split()[1][:-1]))
-            all_samples.append(data.split("(")[1].split(")")[0].split(", "))
+            data = eval(file.read())
 
     samples = [int(x) for batch in all_samples for x in batch]
     return samples, all_temperature
@@ -49,39 +46,24 @@ def save_data_to_binary_file():
                 little_endian_bytes = [x for sublist in little_endian_bytes for x in sublist]
                 output_file.write(bytearray(little_endian_bytes))
                 filename_counter += 1
-                
+
+def save_to_binary_file(samples, filename):
+    with open(file = join(getcwd(), filename), mode="wb") as output_file:
+        little_endian_bytes = [[x & 0xFF, (x & 0xFF00) >> 8] for x in samples]
+        little_endian_bytes = [x for sublist in little_endian_bytes for x in sublist]
+        output_file.write(bytearray(little_endian_bytes))
 
 
 def main():
-    # data_files_path = join(getcwd(), join("data", "bm_data"))
-    # filenames = listdir(data_files_path)
-    # with open(file=join(data_files_path, filenames[0]), mode="r", encoding = "utf-8") as file:
-    #     data = file.read().replace("'","\"").replace("\n", "").replace("(", "[").replace(")", "]")
-        
-
-    # data = read_samples_from_bm_data()
-    # samples = {"samples":data[0], "temp":data[1]}
-    # with open(file=join(getcwd(), join("data", "bm_samples.txt")), mode="w", encoding="utf-8") as file:
-    #     dump(samples, file)
-
-    # samples = read_samples_from_bm_samples()
-
-    # plot.hist(samples["samples"], log=True)
-
-    #odstep pomiedzy tymi dziwnymi wypustkami w dół to jest 6180 probek
-    #dlugosc czasu ktora jest zapisana w plikach to w tym momencie jest 123-16=107 sekund
-    #ilosc probek w plikach w tym momencie wynosi: 3250680
-    #co po przeliczeniu daje około 30kSa, zatem dziwna wypustka występuję z częstotliwością 5Hz
-
-    # data = array_split(samples["samples"], 500)
-    # plot.subplot(2,1,1)
-    # plot.plot([mean(x) for x in data])
-    # plot.subplot(2,1,2)
-    # plot.plot(samples["temp"])
-    # plot.plot(samples["samples"])
-    # plot.show()
-    
-    save_data_to_binary_file()
+    data_folder = join(getcwd(), join("data", "bm_data"))
+    data_output_folder = join("data", "bm_data_bin")
+    filename_counter = 0
+    for filename in listdir(data_folder):
+        with open(join(data_folder, filename), 'r') as f:
+            data = eval(f.read())
+            samples = data["data"]
+            save_to_binary_file(samples, join(data_output_folder, str(filename_counter)))
+            filename_counter += 1
 
 
 if __name__ == "__main__":
