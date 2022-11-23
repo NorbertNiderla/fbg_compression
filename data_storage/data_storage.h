@@ -13,7 +13,7 @@
  * @retval 1 on error
  */
 int data_storage_get_data32_batch(uint32_t* mem, size_t* len);
-int data_storage_get_data16_batch(uint16_t* mem, size_t* len);
+int data_storage_get_data16_batch(uint16_t** mem, size_t* len, unsigned file_number);
 int data_storage_get_data8_batch(uint8_t* mem, size_t* len);
 
 
