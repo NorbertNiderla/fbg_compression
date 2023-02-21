@@ -1,5 +1,8 @@
 /.vscode
-/linked_list/test
-/bitstream/test
-tests/test
-/data_storage/data/bm_data/
+/c/linked_list/test
+/c/bitstream/test
+c/tests/test
+/c/data_storage/data/bm_data/
+/c/data_storage/.idea/
+/.idea
+/python/.idea
