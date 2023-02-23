@@ -1,4 +1,4 @@
-def writeToBitstream(stream: list, value: int, bits: int):
+def bitstream_write(stream: list, value: int, bits: int):
     if value < 0:
         raise Exception("Value cannot be negative!")
 
@@ -9,11 +9,13 @@ def writeToBitstream(stream: list, value: int, bits: int):
     stream.append(format(value, f"0{bits}b"))
 
 
-def readFromBitstream(stream: list, bits: int) -> int:
+def bitstream_read(stream: list, bits: int) -> int or None:
+
     if bits < 1:
         raise Exception("Bits cannot be lower than 1!")
 
     value = None
+
     while bits > 0 and len(stream) > 0:
         value = 0
         next_len = len(stream[0])
@@ -28,3 +30,10 @@ def readFromBitstream(stream: list, bits: int) -> int:
             bits = 0
 
     return value
+
+
+def bitstream_get_bits(stream: list) -> int:
+    bits = 0
+    for val in stream:
+        bits += len(val)
+    return bits

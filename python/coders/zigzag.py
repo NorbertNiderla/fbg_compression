@@ -1,4 +1,4 @@
-def zigzagEncode(data):
+def zigzag_encode(data):
     output = []
     for x in data:
         if x >= 0:
@@ -9,7 +9,7 @@ def zigzagEncode(data):
     return output
 
 
-def zigzagDecode(data):
+def zigzag_decode(data):
     output = []
     for x in data:
         if x % 2 == 0:

@@ -27,4 +27,9 @@ class FbgData:
             self.idx = 0
             last_file = True
 
-        return data, last_file
+        return list(data), last_file
+
+    def get_data_with_index(self, index):
+        with open(join(self.dir, self.files[index])) as datafile:
+            data = eval(datafile.read())["data"]
+            return data

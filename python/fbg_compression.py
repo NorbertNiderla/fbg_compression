@@ -1,34 +1,43 @@
 from matplotlib import pyplot as plt
 from scipy.stats import entropy
-from data import FbgData
+from python.data import FbgData
 from numpy import convolve, ones, unique, nan, average
-from peak_detection import peak_detection_max, peak_detection_band
+from python.peak_detection import peak_detection_max, peak_detection_band
 from enum import Enum
+from python.coders.sprintz import sprintz_encode, sprintz_decode
+from python.coders.fire import Fire
+from python.coders.bitstream import bitstream_get_bits
 
 
 class ProgramType(Enum):
     DATAWALK = 0
     AVERAGE_VALUE = 1
-    STATISTICS = 2
+    INPUT_DATA_STATISTICS = 2
+    LOSSLESS_COMPRESSION = 3
+    PEAKS_LOSSLESS_COMPRESSION = 4
 
 
-PROGRAM_TYPE = ProgramType.STATISTICS
+PROGRAM_TYPE = ProgramType.LOSSLESS_COMPRESSION
 DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 MAX_SAMPLE_VALUE = 16384 - 1
 PEAK_DETECTION_BASIC_THRESHOLD = 1.1
-FILE_STEP = 1000
+FILE_STEP = 100
 
 
 def main():
     print("Fbg Compression")
     print(f"Data folder: {DATA_FILES_FOLDER}")
     fbg_data = FbgData(DATA_FILES_FOLDER, FILE_STEP)
-    if PROGRAM_TYPE == ProgramType.STATISTICS:
+    if PROGRAM_TYPE == ProgramType.INPUT_DATA_STATISTICS:
         show_statistics(fbg_data)
     elif PROGRAM_TYPE == ProgramType.DATAWALK:
         show_datawalk(fbg_data)
-    elif PROGRAM_TYPE == PROGRAM_TYPE.AVERAGE_VALUE:
+    elif PROGRAM_TYPE == ProgramType.AVERAGE_VALUE:
         show_average_figure(fbg_data)
+    elif PROGRAM_TYPE == ProgramType.LOSSLESS_COMPRESSION:
+        show_lossless_compression(fbg_data)
+    elif PROGRAM_TYPE == ProgramType.PEAKS_LOSSLESS_COMPRESSION:
+        show_peaks_lossless_compression(fbg_data)
 
 
 def show_average_figure(fbg_data_source: FbgData):
@@ -66,9 +75,9 @@ def show_statistics(fbg_data_source: FbgData):
         x += 1
 
     peak_max_arr = convert_None_to_NaN(peak_max_arr)
-    peak_band_arr = turn_list_of_lists(peak_band_arr)
+    peak_band_arr_x, peak_band_arr_y = convert_peaks_into_xy(peak_band_arr)
 
-    fig, axs = plt.subplots(4)
+    fig, axs = plt.subplots(5)
     fig.suptitle('Data')
 
     a = 0
@@ -90,14 +99,17 @@ def show_statistics(fbg_data_source: FbgData):
     axs[a].set_ylim([0, 1])
     a += 1
 
-    print("Peak detection Band Method:")
-    print(f"\tMaximum of individual peaks detected:{len(peak_band_arr)}")
-    for small_list in peak_band_arr:
-        small_list = convert_None_to_NaN(small_list)
-        axs[a].plot(small_list, "bo")
+    axs[a].plot(peak_band_arr_x, peak_band_arr_y, "bo")
     axs[a].set_title("Peak Detection (Band Method)")
     axs[a].grid(True)
     axs[a].set_ylim([0, 1])
+    a += 1
+
+    axs[a].plot(fbg_data_source.get_data_with_index(round(fbg_data_source.get_number_of_files() / 2)))
+    axs[a].set_title("Example oscillogram")
+    axs[a].grid(True)
+    axs[a].set_ylim([0, MAX_SAMPLE_VALUE])
+    a += 1
 
     plt.show()
 
@@ -145,6 +157,67 @@ def turn_list_of_lists(arr):
             list_of_lists[idx][small_idx] = val
 
     return list_of_lists
+
+
+def convert_peaks_into_xy(arr):
+    x_plot, y_plot = [], []
+    for x, y_set in enumerate(arr):
+        if y_set[0] is not None:
+            for y in y_set:
+                x_plot.append(x)
+                y_plot.append(y)
+
+    return x_plot, y_plot
+
+
+def show_lossless_compression(fbg_data_source):
+    # SPRINTZ
+    fire_learn_shift = -1
+    fire_bitwidth = 16
+
+    entropy_all = [0] * fbg_data_source.get_number_of_files()
+    bits_all = [0] * fbg_data_source.get_number_of_files()
+    i = 0
+    last_file = False
+
+    while last_file is False:
+        data, last_file = fbg_data_source.get_data()
+        data = data[:(len(data) - (len(data) % 32))]
+        compressor_fire = Fire(fire_bitwidth, fire_learn_shift)
+        decompressor_fire = Fire(fire_bitwidth, fire_learn_shift)
+        compressed_data = sprintz_encode(data, compressor_fire)
+
+        bits_all[i] = bitstream_get_bits(compressed_data) / len(data)
+        entropy_all[i] = entropy_my(MAX_SAMPLE_VALUE, data)
+
+        decompressed_data = sprintz_decode(compressed_data, decompressor_fire)
+
+        if data != decompressed_data:
+            raise ValueError("Data and decompressed data are not the same")
+
+        i += 1
+
+    original_bitwidth = 12
+    print("Sprintz lossless compression:")
+    print("\tData compressed and decompressed successfully")
+    print(f"\tOriginal bitwidth: {original_bitwidth}")
+    print(f"\tData entropy: {average(entropy_all)}")
+    print(f"\tBits per sample in compressed stream: {average(bits_all)}")
+
+    # fig, axs = plt.subplots(1)
+    # fig.suptitle('Lossless compression')
+    # axs.plot(entropy_all, label="entropy")
+    # axs.plot(bits_all, label="compression")
+    # axs.plot([original_bitwidth for _ in range(len(bits_all))], label="original")
+    # axs.set_title("Sprintz compression results")
+    # axs.grid(True)
+    # axs.set_ylim([0, original_bitwidth + 1])
+    # plt.legend()
+    # plt.show()
+
+
+def show_peaks_lossless_compression(fbg_data):
+    pass
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 from math import floor, log2
-from Bitstream import writeToBitstream, readFromBitstream
+from python.coders.bitstream import bitstream_write, bitstream_read
 
 
-def bitpackingEncode(data, max_bitwidth, save_bitwidth_bits, samples_in_packet):
+def bitpacking_encode(data, max_bitwidth, save_bitwidth_bits, samples_in_packet):
     if min(data) < 0:
         raise Exception("Negative data in input is invalid!")
 
@@ -15,7 +15,7 @@ def bitpackingEncode(data, max_bitwidth, save_bitwidth_bits, samples_in_packet):
     for i, sample in enumerate(data):
         if samples_counter % samples_in_packet == 0:
 
-            found_something_else_then_zero = False;
+            found_something_else_then_zero = False
             for val in data[i:i+samples_in_packet]:
                 if val != 0:
                     found_something_else_then_zero = True
@@ -29,22 +29,22 @@ def bitpackingEncode(data, max_bitwidth, save_bitwidth_bits, samples_in_packet):
             if bits > max_bitwidth:
                 raise Exception(f"Input data bitwidth is bigger than {max_bitwidth}")
 
-            writeToBitstream(stream, bits, save_bitwidth_bits)
+            bitstream_write(stream, bits, save_bitwidth_bits)
 
-        writeToBitstream(stream, sample, bits)
+        bitstream_write(stream, sample, bits)
         samples_counter += 1
 
     return stream
 
 
-def bitpackingDecode(stream, max_bitwidth, save_bitwidth_bits, samples_in_packet):
+def bitpacking_decode(stream, max_bitwidth, save_bitwidth_bits, samples_in_packet):
     output = []
     while len(stream) > 0:
-        bits = readFromBitstream(stream, save_bitwidth_bits)
+        bits = bitstream_read(stream, save_bitwidth_bits)
         if bits > max_bitwidth:
             raise Exception(f"Invalid bits value: {bits}, it is bigger than max bitwidth: {max_bitwidth}")
 
         for _ in range(samples_in_packet):
-            output.append(readFromBitstream(stream, bits))
+            output.append(bitstream_read(stream, bits))
 
     return output
