@@ -1,5 +1,5 @@
 from math import floor, log2
-from python.coders.bitstream import bitstream_write, bitstream_read
+from coders.bitstream import bitstream_write, bitstream_read
 
 
 def bitpacking_encode(data, max_bitwidth, save_bitwidth_bits, samples_in_packet):

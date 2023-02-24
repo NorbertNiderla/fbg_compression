@@ -1,21 +1,20 @@
-from python.coders.bitpacking import bitpacking_encode, bitpacking_decode
-from python.coders.fire import Fire
-from python.coders.zigzag import zigzag_encode, zigzag_decode
+from coders.bitpacking import bitpacking_encode, bitpacking_decode
+from coders.fire import Fire
+from coders.zigzag import zigzag_encode, zigzag_decode
 
 MAX_BITWIDTH = 16
 SAVE_BITS_WIDTH = 5
-SAMPLES_IN_PACKET = 32
 
 
-def sprintz_encode(data: list, fire_state: Fire) -> list:
+def sprintz_encode(data: list, fire_state: Fire, samples_in_packet: int) -> list:
     diff_data = fire_state.encode(data)
     normalized_data = zigzag_encode(diff_data)
-    stream = bitpacking_encode(normalized_data, MAX_BITWIDTH, SAVE_BITS_WIDTH, SAMPLES_IN_PACKET)
+    stream = bitpacking_encode(normalized_data, MAX_BITWIDTH, SAVE_BITS_WIDTH, samples_in_packet)
     return stream
 
 
-def sprintz_decode(stream: list, fire_state: Fire) -> list:
-    normalized_data = bitpacking_decode(stream, MAX_BITWIDTH, SAVE_BITS_WIDTH, SAMPLES_IN_PACKET)
+def sprintz_decode(stream: list, fire_state: Fire, samples_in_packet: int) -> list:
+    normalized_data = bitpacking_decode(stream, MAX_BITWIDTH, SAVE_BITS_WIDTH, samples_in_packet)
     diff_data = zigzag_decode(normalized_data)
     data = fire_state.decode(diff_data)
     return data
