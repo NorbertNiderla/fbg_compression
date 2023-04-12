@@ -3,12 +3,10 @@ from sympy import ceiling
 from tqdm import tqdm
 from data import FbgData
 from numpy import unique, nan, average
-from peak_detection import peak_detection_max, peak_detection_band
-from coders.sprintz import sprintz_encode, sprintz_decode
-from coders.fire import Fire
-from coders.bitstream import bitstream_get_bits
+from peak_detection import peak_detection_band
 from algorithms import algorithm_sprintz
 from denoise_data import denoise_data
+
 
 DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 PEAK_DETECTION_BASIC_THRESHOLD = 1.1
@@ -54,12 +52,18 @@ class Results:
         self.result_raw = DataSetResults("raw", 14)
         self.result_noiseless = DataSetResults("noiseless", 14)
         self.result_peaks_stream = DataSetResults("peaks stream", 12)
+        self.result_raw_parallel = DataSetResults("raw parallel", 14)
+        self.result_noiseless_parallel = DataSetResults("noiseless parallel", 14)
+        self.result_raw_parallel_noiseless = DataSetResults("raw parallel noiseless", 14)
 
     def print_results(self):
         print("Results:")
         self.result_raw.print_results()
         self.result_noiseless.print_results()
         self.result_peaks_stream.print_results()
+        self.result_raw_parallel.print_results()
+        self.result_noiseless_parallel.print_results()
+        self.result_raw_parallel_noiseless.print_results()
 
 
 def main():
@@ -67,11 +71,38 @@ def main():
     print(f"\tData folder: {DATA_FILES_FOLDER}")
 
     results = Results()
-    file_step = 3000
+    file_step = 400
     dense_file_step = int(ceiling(file_step / 30))
-    fbg_data = FbgData(DATA_FILES_FOLDER, 3000)
+    fbg_data = FbgData(DATA_FILES_FOLDER, file_step)
     fbg_data_dense = FbgData(DATA_FILES_FOLDER, dense_file_step)
     n_f = fbg_data.get_number_of_files()
+
+    print("Processing parallel data")
+    for x in tqdm(range(5)):
+        data_raw = [0] * n_f
+        for i in range(n_f):
+            data, last_file = fbg_data.get_data()
+            data_raw[i] = data[x]
+
+        data_raw = data_raw[:(len(data_raw) - (len(data_raw) % 32))]
+        results.result_raw_parallel.process(data_raw)
+
+    print("Processing noiseless parallel data")
+    for x in tqdm(range(5)):
+        noiseless_data_raw = [0] * n_f
+        data_raw = [0] * n_f
+        for i in range(n_f):
+            data, last_file = fbg_data.get_data()
+            data_noiseless = [int(round(x)) for x in denoise_data(data)]
+            noiseless_data_raw[i] = data_noiseless[x]
+            data_raw[i] = data[x]
+
+        data_raw = [int(round(x)) for x in denoise_data(data_raw)]
+        data_raw = data_raw[:(len(data_raw) - (len(data_raw) % 32))]
+        results.result_raw_parallel_noiseless.process(data_raw)
+
+        noiseless_data_raw = noiseless_data_raw[:(len(noiseless_data_raw) - (len(noiseless_data_raw) % 32))]
+        results.result_noiseless_parallel.process(noiseless_data_raw)
 
     print("Processing normal fbg data...")
     for i in tqdm(range(n_f)):
@@ -95,7 +126,6 @@ def main():
     peaks_stream = [round(val * scale) for val in peaks_stream_y]
     peaks_stream = peaks_stream[:len(peaks_stream) - len(peaks_stream) % 32]
     results.result_peaks_stream.process(peaks_stream)
-    number_of_peaks_in_stream = len(peaks_stream)
 
     results.print_results()
 
