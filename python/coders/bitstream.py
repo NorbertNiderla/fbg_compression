@@ -2,8 +2,11 @@ def bitstream_write(stream: list, value: int, bits: int):
     if value < 0:
         raise Exception("Value cannot be negative!")
 
-    if bits < 1:
-        raise Exception("Bits cannot be lower than 1!")
+    if bits < 0:
+        raise Exception("Bits cannot be lower than 0!")
+
+    if bits == 0:
+        return
 
     value = value & ((1 << bits) - 1)
     stream.append(format(value, f"0{bits}b"))

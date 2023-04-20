@@ -44,7 +44,11 @@ def bitpacking_decode(stream, max_bitwidth, save_bitwidth_bits, samples_in_packe
         if bits > max_bitwidth:
             raise Exception(f"Invalid bits value: {bits}, it is bigger than max bitwidth: {max_bitwidth}")
 
-        for _ in range(samples_in_packet):
-            output.append(bitstream_read(stream, bits))
+        if bits > 0:
+            for _ in range(samples_in_packet):
+                output.append(bitstream_read(stream, bits))
+        else:
+            for _ in range(samples_in_packet):
+                output.append(0)
 
     return output
