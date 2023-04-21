@@ -1,18 +1,22 @@
+from numpy import average
+
 from data import FbgData
 from matplotlib import pyplot as plt
 from algorithms import algorithm_sprintz
 
 
-NOISE_LEVEL = 2500
 MAX_SAMPLE_VALUE = 10000
 DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 
 fbg_data = FbgData(DATA_FILES_FOLDER, 5000)
 data = fbg_data.get_data_with_index(round(fbg_data.get_number_of_files() / 2))
 data_denoised = list(data).copy()
+noise_level = int(average(data))
+print(f"noise level is {noise_level}")
+
 for i in range(len(data_denoised)):
-    if data_denoised[i] < NOISE_LEVEL:
-        data_denoised[i] = NOISE_LEVEL
+    if data_denoised[i] < noise_level:
+        data_denoised[i] = noise_level
 
 data_denoised = data_denoised[:(len(data_denoised) - (len(data_denoised) % 32))]
 bits = algorithm_sprintz(data_denoised)

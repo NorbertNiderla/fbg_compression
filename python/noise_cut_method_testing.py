@@ -1,28 +1,28 @@
 from numpy import average
-
+from statistics import median
 from data import FbgData
 from matplotlib import pyplot as plt
 from algorithms import algorithm_sprintz
 
 
-NOISE_LEVEL = 2500
+NOISE_LEVEL_FACTOR = 1.2
 MAX_SAMPLE_VALUE = 10000
 DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 
-fbg_data = FbgData(DATA_FILES_FOLDER, 500)
+fbg_data = FbgData(DATA_FILES_FOLDER, 1000)
 
 last_file = False
-bits_all = [0]*fbg_data.get_number_of_files()
+number_of_files = fbg_data.get_number_of_files()
+bits_all = [0]*number_of_files
 bits_index = 0
 
-print(f"number of files: {fbg_data.get_number_of_files()}")
-
 while last_file is False:
-    print(bits_index)
+    print(f"{bits_index}/{number_of_files}")
     data, last_file = fbg_data.get_data()
+    noise_level = int(median(data) * NOISE_LEVEL_FACTOR)
     for i in range(len(data)):
-        if data[i] < NOISE_LEVEL:
-            data[i] = NOISE_LEVEL
+        if data[i] < noise_level:
+            data[i] = noise_level
 
     data = data[:(len(data) - (len(data) % 32))]
     bits_all[bits_index] = algorithm_sprintz(data)

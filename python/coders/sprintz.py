@@ -3,7 +3,7 @@ from coders.fire import Fire
 from coders.zigzag import zigzag_encode, zigzag_decode
 
 MAX_BITWIDTH = 16
-SAVE_BITS_WIDTH = 5
+SAVE_BITS_WIDTH = 4
 
 
 def sprintz_encode(data: list, fire_state: Fire, samples_in_packet: int) -> list:
