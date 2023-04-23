@@ -1,3 +1,5 @@
+from statistics import median
+
 from scipy.stats import entropy
 from sympy import ceiling
 from tqdm import tqdm
@@ -10,6 +12,8 @@ from denoise_data import denoise_data
 
 DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 PEAK_DETECTION_BASIC_THRESHOLD = 1.1
+DECIMATION_RATE = 10
+NOISE_LEVEL_FACTOR = 1.2
 
 
 class AlgorithmResult:
@@ -55,6 +59,8 @@ class Results:
         self.result_raw_parallel = DataSetResults("raw parallel", 14)
         self.result_noiseless_parallel = DataSetResults("noiseless parallel", 14)
         self.result_raw_parallel_noiseless = DataSetResults("raw parallel noiseless", 14)
+        self.result_decimation = DataSetResults("decimation", 14)
+        self.result_noise_floor = DataSetResults("noise floor", 14)
 
     def print_results(self):
         print("Results:")
@@ -64,6 +70,8 @@ class Results:
         self.result_raw_parallel.print_results()
         self.result_noiseless_parallel.print_results()
         self.result_raw_parallel_noiseless.print_results()
+        self.result_decimation.print_results()
+        self.result_noise_floor.print_results()
 
 
 def main():
@@ -71,14 +79,14 @@ def main():
     print(f"\tData folder: {DATA_FILES_FOLDER}")
 
     results = Results()
-    file_step = 400
+    file_step = 200
     dense_file_step = int(ceiling(file_step / 30))
     fbg_data = FbgData(DATA_FILES_FOLDER, file_step)
     fbg_data_dense = FbgData(DATA_FILES_FOLDER, dense_file_step)
     n_f = fbg_data.get_number_of_files()
 
     print("Processing parallel data")
-    for x in tqdm(range(5)):
+    for x in tqdm(range(15)):
         data_raw = [0] * n_f
         for i in range(n_f):
             data, last_file = fbg_data.get_data()
@@ -88,7 +96,7 @@ def main():
         results.result_raw_parallel.process(data_raw)
 
     print("Processing noiseless parallel data")
-    for x in tqdm(range(5)):
+    for x in tqdm(range(15)):
         noiseless_data_raw = [0] * n_f
         data_raw = [0] * n_f
         for i in range(n_f):
@@ -108,7 +116,21 @@ def main():
     for i in tqdm(range(n_f)):
         data, last_file = fbg_data.get_data()
         data_raw = data[:(len(data) - (len(data) % 32))]
+        data_decimation = [x for idx, x in enumerate(data) if idx % DECIMATION_RATE == 0]
+        data_decimation = data_decimation[:(len(data_decimation) - (len(data_decimation) % 32))]
+
+        noise_level = int(median(data) * NOISE_LEVEL_FACTOR)
+        data_noise_floor = data.copy()
+        for i in range(len(data_noise_floor)):
+            if data_noise_floor[i] < noise_level:
+                data_noise_floor[i] = noise_level
+
+        data_noise_floor = data_noise_floor[:(len(data_noise_floor) - (len(data_noise_floor) % 32))]
+
+        results.result_noise_floor.process(data_noise_floor)
         results.result_raw.process(data_raw)
+        results.result_decimation.process(data_decimation)
+
         data_noiseless = [int(round(x)) for x in denoise_data(data)]
         data_noiseless = data_noiseless[:(len(data_noiseless) - (len(data_noiseless) % 32))]
         results.result_noiseless.process(data_noiseless)
