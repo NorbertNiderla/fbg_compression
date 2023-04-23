@@ -1,9 +1,6 @@
 from numpy import convolve, ones
 from data import FbgData
 from matplotlib import pyplot as plt
-from statistics import variance
-from numpy import diff
-
 
 DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 

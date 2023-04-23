@@ -15,17 +15,3 @@ def algorithm_sprintz(data):
         raise ValueError("Sprintz coder failed!")
 
     return bits
-
-
-# data is list of 8 frames from bragg monitor data
-# n of fire coders must be the same as frame length from bragg monitor data
-def algorithm_sprintz_time_along(data, fire_coders):
-    frame_len = len(fire_coders)
-    for i, fire in enumerate(fire_coders):
-        data_batch = [0] * 8
-        for x in range(8):
-            data_batch[x] = data[x][i]
-
-        # in data_batch now we have 8 consecutive samples from one wavelength
-
-

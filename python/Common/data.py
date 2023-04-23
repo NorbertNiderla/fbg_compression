@@ -30,6 +30,7 @@ class FbgData:
         return list(data), last_file
 
     def get_data_with_index(self, index):
+        assert(index < len(self.files))
         with open(join(self.dir, self.files[index])) as datafile:
             data = eval(datafile.read())["data"]
             return data
