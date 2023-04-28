@@ -34,7 +34,7 @@ def bitpacking_encode(data, max_bitwidth, save_bitwidth_bits, samples_in_packet)
                         break
                 zero_packets = zero_counter // samples_in_packet
                 if zero_packets > 4:
-                    bitstream_write(stream, 15, save_bitwidth_bits)
+                    bitstream_write(stream, 31, save_bitwidth_bits)
                     bitstream_write(stream, zero_packets, 15)
                     i += zero_packets * samples_in_packet
                     continue
@@ -57,7 +57,7 @@ def bitpacking_decode(stream, max_bitwidth, save_bitwidth_bits, samples_in_packe
     while len(stream) > 0:
         bits = bitstream_read(stream, save_bitwidth_bits)
 
-        if bits == 15:
+        if bits == 31:
             zero_packets = bitstream_read(stream, 15)
             for _ in range(zero_packets):
                 for _ in range(samples_in_packet):

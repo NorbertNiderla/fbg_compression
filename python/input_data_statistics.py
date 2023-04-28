@@ -1,6 +1,6 @@
 from data import FbgData
 from peak_detection import peak_detection_max, peak_detection_band
-from fbg_compression import entropy_my, convert_None_to_NaN, convert_peaks_into_xy
+from main import entropy_my, convert_None_to_NaN, convert_peaks_into_xy
 from numpy import convolve, ones, average
 from matplotlib import pyplot as plt
 from statistics import variance

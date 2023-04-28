@@ -13,8 +13,8 @@ def zigzag_decode(data):
     output = []
     for x in data:
         if x % 2 == 0:
-            output.append(int(x / 2))
+            output.append(x // 2)
         else:
-            output.append(int((x - 1) / -2))
+            output.append((x - 1) // -2)
 
     return output
