@@ -406,13 +406,17 @@ EXAMPLE_DATA_1 = [1959, 2107, 2011, 1280, 1512, 1808, 1895, 2046, 2192, 1840, 19
 
 def test_arithmetic_failed_data():
     data = EXAMPLE_DATA_1
-    counts = [0] * (max(data) + 1)
+    base = min(data)
+    counts = [0] * (max(data) - base + 1)
     for x in data:
-        counts[x] += 1
+        counts[base - x] += 1
 
-    stream = arithmetic_encode(data, counts)
+    stream = arithmetic_encode([x - base for x in data], counts)
     decoded_data = arithmetic_decode(stream, counts, len(data))
 
+    decoded_data = [x + base for x in decoded_data]
+
     assert data == decoded_data
+
 
 test_arithmetic_failed_data()

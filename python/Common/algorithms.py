@@ -29,12 +29,15 @@ def algorithm_sprintz(data: list) -> float:
 
 
 def algorithm_arithmetic(data: list) -> float:
-    counts = [0] * (max(data) + 1)
+    base = min(data)
+    counts = [0] * (max(data) - base + 1)
     for x in data:
-        counts[x] += 1
+        counts[base - x] += 1
 
-    stream = arithmetic_encode(data, counts)
+    stream = arithmetic_encode([x - base for x in data], counts)
     decoded_data = arithmetic_decode(stream, counts, len(data))
+
+    decoded_data = [x + base for x in decoded_data]
 
     if data != decoded_data:
         raise ValueError("Arithmetic coder failed!")
