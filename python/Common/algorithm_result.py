@@ -11,3 +11,6 @@ class AlgorithmResult:
 
     def print_results(self):
         print(f"\t\t{self.algorithm}: {average(self.bits)}")
+
+    def get_results(self):
+        return [self.algorithm, average(self.bits)]

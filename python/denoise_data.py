@@ -1,6 +1,6 @@
 from numpy import convolve, ones
-from data import FbgData
 from matplotlib import pyplot as plt
+from Common.data import FbgData
 
 DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 

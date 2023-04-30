@@ -1,5 +1,4 @@
 from random import randint
-
 from coders.bitpacking import bitpacking_encode, bitpacking_decode
 
 
