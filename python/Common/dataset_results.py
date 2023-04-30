@@ -1,6 +1,6 @@
 from numpy import average
 from Common.algorithm_result import AlgorithmResult
-from Common.algorithms import algorithm_sprintz, algorithm_sprintz_delta
+from Common.algorithms import algorithm_sprintz, algorithm_sprintz_delta, algorithm_arithmetic
 from Common.utility import entropy_my
 
 
@@ -13,7 +13,8 @@ class DataSetResults:
         self.mse = []
         self.results = {
             "sprintz": (AlgorithmResult("sprintz"), algorithm_sprintz),
-            "sprintz delta": (AlgorithmResult("sprintz delta"), algorithm_sprintz_delta)
+            "sprintz delta": (AlgorithmResult("sprintz delta"), algorithm_sprintz_delta),
+            "arithmetic": (AlgorithmResult("arithmetic"), algorithm_arithmetic)
         }
 
     def process(self, data):

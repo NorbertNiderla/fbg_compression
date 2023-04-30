@@ -60,9 +60,13 @@ class FbgCompressionResults:
         print("Processing normal fbg data...")
         for i in tqdm(range(n_f)):
             data = data_source.get_sample_with_index(i)
-            self.process_raw(data)
-            self.process_noise_floor(data)
-            self.process_noiseless(data)
+            try:
+                self.process_raw(data)
+                self.process_noise_floor(data)
+                self.process_noiseless(data)
+            except ValueError as err:
+                print(err, data)
+                exit(-1)
 
         print("Processing peaks stream...")
         self.process_peaks_stream(data_source_dense)

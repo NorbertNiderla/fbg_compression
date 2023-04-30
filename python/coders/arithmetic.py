@@ -1,4 +1,3 @@
-import logging
 from math import ceil, floor
 from numpy import cumsum, insert
 from numpy.core.fromnumeric import searchsorted
