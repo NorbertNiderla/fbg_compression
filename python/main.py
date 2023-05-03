@@ -8,7 +8,14 @@ DATA_FILES_FOLDER = "C:/Users/norbert/PycharmProjects/data"
 PEAK_DETECTION_BASIC_THRESHOLD = 1.1
 DECIMATION_RATE = 10
 NOISE_LEVEL_FACTOR = 1.2
-FILE_STEP = 5000
+
+OSCYLLOGRAMS_NUM = 20
+OSCYLLOGRAMS_DENSE_NUM = 600
+
+FILE_STEP = 78500 // OSCYLLOGRAMS_NUM
+DENSE_FILE_STEP = 78500 // OSCYLLOGRAMS_DENSE_NUM
+JULEK_FILE_STEP = 33138 // OSCYLLOGRAMS_NUM
+DENSE_JULEK_FILE_STEP = 33138 // OSCYLLOGRAMS_DENSE_NUM
 
 
 def main():
@@ -19,11 +26,12 @@ def main():
     fbg_data = FbgData(DATA_FILES_FOLDER, file_step)
     fbg_data_dense = FbgData(DATA_FILES_FOLDER, dense_file_step)
 
-    julek_data = DataFromJulek()
+    julek_data = DataFromJulek(JULEK_FILE_STEP)
+    julek_dense_data = DataFromJulek(DENSE_JULEK_FILE_STEP)
 
     results = {
         "multiple peaks": fbg_compression.add_and_process_dataset(fbg_data, fbg_data_dense),
-        # "single peak": fbg_compression.add_and_process_dataset(julek_data, julek_data)
+        # "single peak": fbg_compression.add_and_process_dataset(julek_data, julek_dense_data)
     }
 
     pprint(results)

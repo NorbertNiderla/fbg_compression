@@ -1,7 +1,6 @@
 from random import randint
 from numpy.random import normal
-
-from coders.arithmetic import arithmetic_encode, arithmetic_decode
+from coders.arithmetic import ArithmeticCoder
 
 
 def test_arithmetic_small():
@@ -10,8 +9,9 @@ def test_arithmetic_small():
     for x in data:
         counts[x] += 1
 
-    stream = arithmetic_encode(data, counts)
-    decoded_data = arithmetic_decode(stream, counts, len(data))
+    coder = ArithmeticCoder()
+    stream = coder.encode(data, counts)
+    decoded_data = coder.decode(stream, counts, len(data))
 
     assert data == decoded_data
 
@@ -23,8 +23,9 @@ def test_arithmetic_small_distribution():
     for x in data:
         counts[x] += 1
 
-    stream = arithmetic_encode(data, counts)
-    decoded_data = arithmetic_decode(stream, counts, len(data))
+    coder = ArithmeticCoder()
+    stream = coder.encode(data, counts)
+    decoded_data = coder.decode(stream, counts, len(data))
 
     assert data == decoded_data
 
@@ -36,9 +37,9 @@ def test_arithmetic_big_distribution():
     for x in data:
         counts[x] += 1
 
-    stream = arithmetic_encode(data, counts)
-    decoded_data = arithmetic_decode(stream, counts, len(data))
-    print(len(data) * 16, len(stream))
+    coder = ArithmeticCoder()
+    stream = coder.encode(data, counts)
+    decoded_data = coder.decode(stream, counts, len(data))
     assert data == decoded_data
 
 
@@ -406,17 +407,12 @@ EXAMPLE_DATA_1 = [1959, 2107, 2011, 1280, 1512, 1808, 1895, 2046, 2192, 1840, 19
 
 def test_arithmetic_failed_data():
     data = EXAMPLE_DATA_1
-    base = min(data)
-    counts = [0] * (max(data) - base + 1)
+    counts = [0] * (max(data) + 1)
     for x in data:
-        counts[base - x] += 1
+        counts[x] += 1
 
-    stream = arithmetic_encode([x - base for x in data], counts)
-    decoded_data = arithmetic_decode(stream, counts, len(data))
-
-    decoded_data = [x + base for x in decoded_data]
+    coder = ArithmeticCoder()
+    stream = coder.encode(data, counts)
+    decoded_data = coder.decode(stream, counts, len(data))
 
     assert data == decoded_data
-
-
-test_arithmetic_failed_data()

@@ -50,8 +50,8 @@ class FbgData(Data):
 
 
 class DataFromJulek(Data):
-    def __init__(self):
-        self.x, self.y = get_data_from_julek()
+    def __init__(self, file_step: int):
+        self.x, self.y = get_data_from_julek(file_step)
         self.size = len(self.y)
         self.idx = 0
 

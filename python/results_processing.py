@@ -1,5 +1,4 @@
 from math import nan
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -8,49 +7,58 @@ data = {'multiple peaks': [{'data set': 'raw',
                             'mse': nan,
                             'original bitwidth': 14,
                             'results': [['sprintz', 10.013065570053387],
-                                        ['sprintz delta', 10.079345742378331]]},
+                                        ['sprintz delta', 10.079345742378331],
+                                        ['arithmetic', 8.620011131037042]]},
                            {'data set': 'noiseless',
                             'entropy': 4.5336990489232845,
                             'mse': 13183.036641724897,
                             'original bitwidth': 14,
                             'results': [['sprintz', 5.195169336054253],
-                                        ['sprintz delta', 5.23830828849999]]},
+                                        ['sprintz delta', 5.23830828849999],
+                                        ['arithmetic', 6.540931296765816]]},
                            {'data set': 'peaks stream',
                             'entropy': 6.474695665695363,
                             'mse': nan,
                             'original bitwidth': 12,
                             'results': [['sprintz', 5.17962870045158],
-                                        ['sprintz delta', 5.1073758153537385]]},
+                                        ['sprintz delta', 5.1073758153537385],
+                                        ['arithmetic', 9.341445057701957]]},
                            {'data set': 'raw parallel',
                             'entropy': 4.458495623956762,
                             'mse': nan,
                             'original bitwidth': 14,
                             'results': [['sprintz', 10.31464968152866],
-                                        ['sprintz delta', 10.385987261146497]]},
+                                        ['sprintz delta', 10.385987261146497],
+                                        ['arithmetic', 6.439490445859873]]},
                            {'data set': 'noiseless parallel',
                             'entropy': 4.103054350129071,
                             'mse': 335569.11592356686,
                             'original bitwidth': 14,
                             'results': [['sprintz', 8.54140127388535],
-                                        ['sprintz delta', 8.54140127388535]]},
+                                        ['sprintz delta', 8.54140127388535],
+                                        ['arithmetic', 5.929936305732484]]},
                            {'data set': 'raw parallel noiseless',
                             'entropy': 3.819986437631907,
                             'mse': 335569.11592356686,
                             'original bitwidth': 14,
                             'results': [['sprintz', 6.778343949044586],
-                                        ['sprintz delta', 6.742675159235668]]},
+                                        ['sprintz delta', 6.742675159235668],
+                                        ['arithmetic', 5.5184713375796175]]},
                            {'data set': 'noise floor',
                             'entropy': 0.5669652299939721,
                             'mse': 175664.1974779956,
                             'original bitwidth': 14,
                             'results': [['sprintz', 0.684510337435327],
-                                        ['sprintz delta', 0.68454847154371]]}]}
+                                        ['sprintz delta', 0.68454847154371],
+                                        ['arithmetic', 0.8182013068662007]]}]}
 
 MSE_SCALE = 40000
 
 labels = [entry['data set'] for entry in data['multiple peaks']]
 sprintz_values = [entry['results'][0][1] for entry in data['multiple peaks']]
 sprintz_delta_values = [entry['results'][1][1] for entry in data['multiple peaks']]
+arithmetic_values = [entry['results'][2][1] for entry in data['multiple peaks']]
+entropy_values = [entry['entropy'] for entry in data['multiple peaks']]
 mse_values = [entry['mse'] / MSE_SCALE for entry in data['multiple peaks']]
 
 index = np.arange(len(labels))
@@ -60,6 +68,8 @@ fig, axs = plt.subplots(1, 2)
 
 axs[0].bar(index, sprintz_values, bar_width, label='Sprintz')
 axs[0].bar(index + bar_width, sprintz_delta_values, bar_width, label='Sprintz Delta')
+axs[0].bar(index + 2 * bar_width, arithmetic_values, bar_width, label='Arithmetic')
+axs[0].bar(index + 3 * bar_width, entropy_values, bar_width, label='Entropy')
 axs[0].set_xlabel('Data Set')
 axs[0].set_ylabel('Results')
 axs[0].set_title('Results for Multiple Peaks')

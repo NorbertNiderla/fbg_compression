@@ -1,4 +1,4 @@
-from coders.arithmetic import arithmetic_encode, arithmetic_decode
+from coders.arithmetic import ArithmeticCoder
 from coders.predict import Fire
 from coders.sprintz import sprintz_encode, sprintz_decode, sprintz_delta_encode, sprintz_delta_decode
 from coders.bitstream import bitstream_get_bits
@@ -29,17 +29,16 @@ def algorithm_sprintz(data: list) -> float:
 
 
 def algorithm_arithmetic(data: list) -> float:
-    base = min(data)
-    counts = [0] * (max(data) - base + 1)
+    counts = [0] * (max(data) + 1)
     for x in data:
-        counts[base - x] += 1
+        counts[x] += 1
 
-    stream = arithmetic_encode([x - base for x in data], counts)
-    decoded_data = arithmetic_decode(stream, counts, len(data))
-
-    decoded_data = [x + base for x in decoded_data]
+    coder = ArithmeticCoder()
+    stream = coder.encode(data, counts)
+    stream_len = len(stream)
+    decoded_data = coder.decode(stream, counts, len(data))
 
     if data != decoded_data:
         raise ValueError("Arithmetic coder failed!")
 
-    return len(stream) / len(data)
+    return stream_len / len(data)
