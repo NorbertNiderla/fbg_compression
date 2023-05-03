@@ -42,10 +42,10 @@ class DataSetResults:
             "original bitwidth": self.original_bitwidth,
             "entropy": average(self.entropy),
             "mse": average(self.mse),
-            "results": []
+            "results": {}
         }
 
         for r in self.results.values():
-            results["results"].append(r[0].get_results())
+            results["results"][r[0].get_name()] = r[0].get_results()
 
         return results

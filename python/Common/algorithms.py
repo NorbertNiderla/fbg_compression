@@ -10,6 +10,7 @@ def algorithm_sprintz_delta(data: list) -> float:
     decompressed_data = sprintz_delta_decode(compressed_data, 32)
 
     if data != decompressed_data:
+        print(data)
         raise ValueError("SprintzDelta coder failed!")
 
     return bits
@@ -23,6 +24,7 @@ def algorithm_sprintz(data: list) -> float:
     decompressed_data = sprintz_decode(compressed_data, decompressor_fire, 32)
 
     if data != decompressed_data:
+        print(data)
         raise ValueError("Sprintz coder failed!")
 
     return bits
@@ -39,6 +41,7 @@ def algorithm_arithmetic(data: list) -> float:
     decoded_data = coder.decode(stream, counts, len(data))
 
     if data != decoded_data:
+        print(data)
         raise ValueError("Arithmetic coder failed!")
 
     return stream_len / len(data)

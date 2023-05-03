@@ -66,4 +66,4 @@ class DataFromJulek(Data):
         return data
 
     def get_sample_with_index(self, index: int) -> list:
-        return self.y[index]
+        return self.y[index].tolist()

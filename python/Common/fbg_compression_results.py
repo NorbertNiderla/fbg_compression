@@ -20,6 +20,8 @@ def mse(arr1: list, arr2: list) -> float:
 
 def threading_calculate_peak_detection_band(start: int, end: int, data_source: Data, results: list):
     for i in range(start, end):
+        if i % 10 == 0:
+            print(f"Calculating peak band {i}/{end}")
         data = data_source.get_sample_with_index(i)
         results[i] = peak_detection_band(data)
 
@@ -39,8 +41,8 @@ class FbgCompressionResults:
     def add_and_process_dataset(self, data_source: Data, data_source_dense: Data):
         n_f = data_source.get_number_of_samples()
 
-        print("Processing parallel data")
-        for x in tqdm(range(PARALEL_STREAMS)):
+        for x in range(PARALEL_STREAMS):
+            print(f"Processing parallel data {x}/{PARALEL_STREAMS}")
             noiseless_data_raw = [0] * n_f
             data_raw = [0] * n_f
             for i in range(n_f):
@@ -57,18 +59,13 @@ class FbgCompressionResults:
             self.result_raw_parallel_noiseless.append_mse(mse(data_raw, noiseless_data_raw))
             self.result_noiseless_parallel.process(noiseless_data_raw)
 
-        print("Processing normal fbg data...")
-        for i in tqdm(range(n_f)):
+        for i in range(n_f):
+            print(f"Processing normal fbg data {i}/{n_f}")
             data = data_source.get_sample_with_index(i)
-            try:
-                self.process_raw(data)
-                self.process_noise_floor(data)
-                self.process_noiseless(data)
-            except ValueError as err:
-                print(err, data)
-                exit(-1)
+            self.process_raw(data)
+            self.process_noise_floor(data)
+            self.process_noiseless(data)
 
-        print("Processing peaks stream...")
         self.process_peaks_stream(data_source_dense)
 
         return self.get_results()

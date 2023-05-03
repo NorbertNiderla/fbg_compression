@@ -13,4 +13,7 @@ class AlgorithmResult:
         print(f"\t\t{self.algorithm}: {average(self.bits)}")
 
     def get_results(self):
-        return [self.algorithm, average(self.bits)]
+        return average(self.bits)
+
+    def get_name(self):
+        return self.algorithm

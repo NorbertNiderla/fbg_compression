@@ -7,8 +7,19 @@ HALF = TOP_VALUE // 2 + 1
 THIRD_QTR = TOP_VALUE // 4 * 3 + 1
 
 
+def cumulative_to_table(cumulative_array):
+    max_value = max(cumulative_array) + 1
+    table = [0] * max_value
+    for i in range(len(cumulative_array) - 1):
+        for idx in range(cumulative_array[i], cumulative_array[i + 1]):
+            table[idx] = i
+    return table
+
+
 class ArithmeticCoder:
     def __init__(self):
+        self.decoding_table = None
+        self.stream_idx = None
         self.value = None
         self.stream = None
         self.bits_to_follow = None
@@ -19,7 +30,9 @@ class ArithmeticCoder:
         self.low = 0
         self.high = TOP_VALUE
         self.bits_to_follow = 0
-        self.stream = []
+        self.stream = [0] * (len(data) * 16)
+        self.stream_idx = 0
+
         cum_freqs = cumsum(counts).tolist()
         cum_freqs.insert(0, 0)
 
@@ -32,7 +45,7 @@ class ArithmeticCoder:
         else:
             self.bit_plus_follow(1)
 
-        return self.stream
+        return self.stream[:self.stream_idx]
 
     def decode(self, stream, counts, target_size) -> list:
         self.stream = stream
@@ -46,6 +59,7 @@ class ArithmeticCoder:
         self.high = TOP_VALUE
         cum_freqs = cumsum(counts).tolist()
         cum_freqs.insert(0, 0)
+        self.decoding_table = cumulative_to_table(cum_freqs)
         output = [0] * target_size
 
         for x in range(target_size):
@@ -54,12 +68,14 @@ class ArithmeticCoder:
         return output
 
     def bit_plus_follow(self, bit):
-        self.stream.append(bit)
+        self.stream[self.stream_idx] = bit
+        self.stream_idx += 1
         for _ in range(self.bits_to_follow):
             if bit == 0:
-                self.stream.append(1)
+                self.stream[self.stream_idx] = 1
             else:
-                self.stream.append(0)
+                self.stream[self.stream_idx] = 0
+            self.stream_idx += 1
         self.bits_to_follow = 0
 
     def encode_symbol(self, symbol, cum_freq):
@@ -88,9 +104,10 @@ class ArithmeticCoder:
         step = self.high - self.low + 1
         cum = ((self.value - self.low + 1) * cum_freq[-1] - 1) // step
 
-        symbol = 0
-        while not (cum_freq[symbol] <= cum < cum_freq[symbol + 1]):
-            symbol += 1
+        symbol = self.decoding_table[cum]
+        # symbol = 0
+        # while not (cum_freq[symbol] <= cum < cum_freq[symbol + 1]):
+        #     symbol += 1
 
         assert symbol <= len(cum_freq) - 2
 

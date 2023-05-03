@@ -18,6 +18,15 @@ def test_sprintz_delta():
     assert data == decode_data
 
 
+def test_sprintz_failing():
+    data = [1893, 2010, 2115, 1923, 1993, 1978, 1908, 2111, 1913, 1951, 1967, 1915, 1927, 2198, 1919, 2063, 1769, 1997,
+            1999, 1935, 1887]
+    fire_encoder, fire_decoder = Fire(), Fire()
+    compressed = sprintz_encode(data, fire_encoder, 32)
+    decode_data = sprintz_decode(compressed, fire_decoder, 32)
+    assert data == decode_data
+
+
 failing_data = (
     1959, 2107, 2011, 1280, 1512, 1808, 1895, 2046, 2192, 1840, 1938, 2057, 1882, 2035, 2178, 1840, 1955, 2064, 1890,
     1999,
