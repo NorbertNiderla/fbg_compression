@@ -1,8 +1,11 @@
 from math import nan
+from statistics import median
+
 import numpy as np
 from matplotlib import pyplot as plt
 
 from Common.data import FbgData, DataFromJulek
+from denoise_data import denoise_data
 
 data = {
     'multiple peaks': [{'data set': 'raw',
@@ -193,20 +196,81 @@ def fig_example_oscyllogram(figure_name: str, figure_title: str, data: list):
     plt.savefig(figure_name, bbox_inches='tight')
 
 
+def fig_denoising_process_example(figure_name: str, figure_title: str, data: list, denoised_data: list):
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(data, label="Surowe dane")
+    ax.plot(denoised_data, label="Dane odszumione")
+    ax.legend()
+    ax.set_xlabel('Numer próbki')
+    ax.set_ylabel('Znormalizowana moc optyczna')
+    ax.set_title(figure_title)
+    plt.savefig(figure_name, bbox_inches='tight')
+
+
+def fig_noise_floor_process_example(figure_name: str, figure_title: str, data: list, denoised_data: list):
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(data, label="Surowe dane")
+    ax.plot(denoised_data, label="Dane po trasformacji")
+    ax.legend()
+    ax.set_xlabel('Numer próbki')
+    ax.set_ylabel('Znormalizowana moc optyczna')
+    ax.set_title(figure_title)
+    plt.savefig(figure_name, bbox_inches='tight')
+
+# Raw data results
 fig_raw_data_results("Figures/results_raw.png", data)
+
+# Mean square error values
 fig_mean_square_error("Figures/mse.png", data)
 
+# Lossy results for both datasets
 target_datasets = ['noiseless', 'raw parallel', 'noiseless parallel',
                    'raw parallel noiseless', 'noise floor']
-fig_dataset_results("Figures/results_wide_lossy.png", [entry for entry in data['multiple peaks'] if entry['data set'] in target_datasets])
-fig_dataset_results("Figures/results_thin_lossy.png", [entry for entry in data['single peak'] if entry['data set'] in target_datasets])
+fig_dataset_results("Figures/results_wide_lossy.png",
+                    [entry for entry in data['multiple peaks'] if entry['data set'] in target_datasets])
+fig_dataset_results("Figures/results_thin_lossy.png",
+                    [entry for entry in data['single peak'] if entry['data set'] in target_datasets])
 
+# Results for peaks dataset
 fig_peaks_data_results("Figures/results_peaks.png", data)
 
+# Example oscillogram for wide dataset
 wide_data = FbgData("C:/Users/norbert/PycharmProjects/data", 10000)
 data = wide_data.get_sample_with_index(wide_data.get_number_of_samples() // 2)
 fig_example_oscyllogram("Figures/wide_data_example.png", "Przykład oscylogramu z szerokiego zbioru danych", data)
 
+# Example escillogram for thin dataset
 thin_data = DataFromJulek(1000)
 data = thin_data.get_sample_with_index(thin_data.get_number_of_samples() // 2)
 fig_example_oscyllogram("Figures/thin_data_example.png", "Przykład oscylogramu z wąskiego zbioru danych", data)
+
+# Example of denoising process for thin dataset
+data_source = DataFromJulek(1000)
+data = data_source.get_sample_with_index(data_source.get_number_of_samples() // 2)
+denoised_data = denoise_data(data, 7)
+fig_denoising_process_example("Figures/thin_data_denoising.png", "Przykład procesu odszumania wąskiego zbioru danych",
+                              data, denoised_data)
+
+# Example of noise floor method for thin dataset
+noise_level = int(median(data) * 1.2)
+data_noise_floor = data.copy()
+for x in range(len(data_noise_floor)):
+    if data_noise_floor[x] < noise_level:
+        data_noise_floor[x] = noise_level
+fig_noise_floor_process_example("Figures/thin_data_noise_floor.png", "Przykład procesu ustalenia poziomu tła dla wąskiego zbioru danych",
+                                data, data_noise_floor)
+
+# Example of denoising process for wide dataset
+data = wide_data.get_sample_with_index(wide_data.get_number_of_samples() // 2)
+denoised_data = denoise_data(data, 30)
+fig_denoising_process_example("Figures/wide_data_denoising.png", "Przykład procesu odszumania szerokiego zbioru danych",
+                              data, denoised_data)
+
+# Example of noise floor method for wide dataset
+noise_level = int(median(data) * 1.2)
+data_noise_floor = data.copy()
+for x in range(len(data_noise_floor)):
+    if data_noise_floor[x] < noise_level:
+        data_noise_floor[x] = noise_level
+fig_noise_floor_process_example("Figures/wide_data_noise_floor.png", "Przykład procesu ustalenia poziomu tła dla szerokiego zbioru danych",
+                                data, data_noise_floor)
