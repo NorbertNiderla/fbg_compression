@@ -6,3 +6,5 @@ c/tests/test
 /c/data_storage/.idea/
 /.idea
 /python/.idea
+/fbg_compression/target/
+/fbg_compression/.idea/
