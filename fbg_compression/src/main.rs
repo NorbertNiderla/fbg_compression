@@ -1,8 +1,26 @@
+use std::mem::size_of_val;
+
+struct FirePredictor {
+    learn_shift: u32,
+    bitwidth: u32,
+    accumulator: u32,
+    delta: u32,
+}
+
+impl FirePredictor {
+    pub fn new(learning_rate: u32, bitwidth: u32) -> Self {
+        FirePredictor {
+            learn_shift: ((learning_rate  as f64).ln() / LN_2).floor() as u32,
+            bitwidth,
+            
+        }
+    }
+}
+
 struct Bitstream {
     stream: Vec<u8>,
     buff: u8,
     buff_bits: u32,
-    max_buff_bits: u32,
 }
 
 impl Bitstream {
@@ -11,8 +29,19 @@ impl Bitstream {
             stream: Vec::new(),
             buff: 0,
             buff_bits: 0,
-            max_buff_bits: 8,
         }
+    }
+
+    pub fn new_from_vec(data: &Vec<u8>) -> Self {
+        Bitstream {
+            stream: data.clone(),
+            buff: 0,
+            buff_bits: 0
+        }
+    }
+
+    fn max_buff_bits(& self) -> u32 {
+        size_of_val(&self.buff) as u32
     }
 
     pub fn write(&mut self, value: u32, bits: u32) -> Result<u32, &'static str> {
@@ -26,7 +55,7 @@ impl Bitstream {
             self.buff |= ((value >> (bits - i - 1)) & 1) as u8;
             self.buff_bits += 1;
 
-            if self.buff_bits == self.max_buff_bits {
+            if self.buff_bits == self.max_buff_bits() {
                 self.stream.push(self.buff);
                 self.buff = 0;
                 self.buff_bits = 0;
@@ -37,7 +66,9 @@ impl Bitstream {
     }
 
     pub fn end_writing(&mut self) {
-        self.buff <<= self.max_buff_bits - self.buff_bits;
+        if self.buff_bits > 0 {
+            self.buff <<= self.max_buff_bits() - self.buff_bits;
+        }
         self.stream.push(self.buff);
         self.buff = 0;
         self.buff_bits = 0;
@@ -57,10 +88,10 @@ impl Bitstream {
                 }
 
                 self.buff = self.stream.remove(0);
-                self.buff_bits = self.max_buff_bits;
+                self.buff_bits = self.max_buff_bits();
             }
 
-            let bit: u32 = (self.buff >> self.max_buff_bits - 1) as u32;
+            let bit: u32 = (self.buff >> self.max_buff_bits() - 1) as u32;
             self.buff <<= 1;
             self.buff_bits -= 1;
             value <<= 1;
@@ -103,8 +134,17 @@ use std::cmp::max;
 use std::f64::consts::LN_2;
 
 fn calculate_bits(data: &Vec<u16>, i: usize, samples_in_packet: usize) -> u32 {
-    let max_value = (i..i + samples_in_packet).fold(0, |acc, x| max(acc, data[x] as u32));
-    let bits = ((  as f64).ln() / LN_2 + 1.0).floor() as u32;
+    let start_idx = i;
+    let end_idx;
+
+    if start_idx + samples_in_packet > data.len() {
+        end_idx = data.len();
+    } else {
+        end_idx = start_idx + samples_in_packet;
+    }
+
+    let max_value = (start_idx..end_idx).fold(0, |acc, x| max(acc, data[x] as u32));
+    let bits = ((max_value  as f64).ln() / LN_2 as f64 + 1.0).floor() as u32;
     bits
 }
 
@@ -180,7 +220,7 @@ pub fn bitpacking_decode(data: &Vec<u8>, target_size: u32, max_bitwidth: u32, sa
 
     let mut out: Vec<u16> = Vec::new();
     let mut i = 0;
-    let mut stream: Bitstream = Bitstream {stream: data.clone(), buff: 0, buff_bits: 0, max_buff_bits: 9};
+    let mut stream: Bitstream = Bitstream::new_from_vec(data);
 
     while i < target_size {
         let bits = stream.read(save_bitwidth_bits).unwrap();
@@ -201,14 +241,20 @@ pub fn bitpacking_decode(data: &Vec<u8>, target_size: u32, max_bitwidth: u32, sa
         if bits > 0 {
             for _ in 0..samples_in_packet {
                 out.push(stream.read(bits).unwrap() as u16);
+                i += 1;
+                if i == target_size {
+                    break;
+                }
             }
         } else {
             for _ in 0..samples_in_packet {
-                out.push(0)
+                out.push(0);
+                i += 1;
+                if i == target_size {
+                    break;
+                }
             }
         }
-
-        i += samples_in_packet as u32;
     }
 
     Ok(out)
