@@ -22,9 +22,15 @@ NOISE_LEVEL_FACTOR = 1.2
 # THIN_OSCYLLOGRAM_DENSE_NUM = 6000
 
 # 20 minutes data input
-WIDE_OSCYLLOGRAM_NUM = 800
-WIDE_OSCYLLOGRAMS_DENSE_NUM = 24000
-THIN_OSCYLLOGRAM_NUM = 8000
+# WIDE_OSCYLLOGRAM_NUM = 800
+# WIDE_OSCYLLOGRAMS_DENSE_NUM = 24000
+# THIN_OSCYLLOGRAM_NUM = 8000
+# THIN_OSCYLLOGRAM_DENSE_NUM = 30000
+
+# 60 minutes data input
+WIDE_OSCYLLOGRAM_NUM = 2400
+WIDE_OSCYLLOGRAMS_DENSE_NUM = 72000
+THIN_OSCYLLOGRAM_NUM = 24000
 THIN_OSCYLLOGRAM_DENSE_NUM = 30000
 
 FILE_STEP = 78500 // WIDE_OSCYLLOGRAM_NUM
@@ -40,13 +46,14 @@ def main():
     dense_file_step = int(ceiling(file_step / 30))
     fbg_data = FbgData(DATA_FILES_FOLDER, file_step)
     fbg_data_dense = FbgData(DATA_FILES_FOLDER, dense_file_step)
+    fbg_data_denoise_step = 30
 
     julek_data = DataFromJulek(JULEK_FILE_STEP)
     julek_dense_data = DataFromJulek(DENSE_JULEK_FILE_STEP)
-
+    julek_data_denoise_step = 7
     results = {
-        "multiple peaks": fbg_compression.add_and_process_dataset(fbg_data, fbg_data_dense),
-        "single peak": fbg_compression.add_and_process_dataset(julek_data, julek_dense_data)
+        "multiple peaks": fbg_compression.add_and_process_dataset(fbg_data, fbg_data_dense, fbg_data_denoise_step),
+        "single peak": fbg_compression.add_and_process_dataset(julek_data, julek_dense_data, julek_data_denoise_step)
     }
 
     pprint(results)
