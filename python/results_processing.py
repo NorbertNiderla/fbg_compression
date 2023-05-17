@@ -1,97 +1,95 @@
 from math import nan
 from statistics import median
-
 import numpy as np
 from matplotlib import pyplot as plt
-
 from Common.data import FbgData, DataFromJulek
 from denoise_data import denoise_data
 
 data = {
     'multiple peaks': [{'data set': 'raw',
-                        'entropy': 5.977875151550401,
+                        'entropy': 5.977535351924411,
                         'mse': nan,
                         'original bitwidth': 14,
-                        'results': {'arithmetic': 8.624420324109426,
-                                    'sprintz': 10.016329305196983}},
+                        'results': {'arithmetic': 8.623932586344967,
+                                    'sprintz': 10.016995766362303}},
                        {'data set': 'noiseless',
-                        'entropy': 4.536279157564378,
-                        'mse': 13236.597721496995,
+                        'entropy': 4.535898454428314,
+                        'mse': 13233.245042131886,
                         'original bitwidth': 14,
-                        'results': {'arithmetic': 6.544641406979141,
-                                    'sprintz': 5.197311814923902}},
+                        'results': {'arithmetic': 6.544090256036792,
+                                    'sprintz': 5.196011026719808}},
                        {'data set': 'peaks stream',
-                        'entropy': 6.648519993772593,
+                        'entropy': 6.678212082205621,
                         'mse': nan,
                         'original bitwidth': 12,
-                        'results': {'arithmetic': 9.59185360094451,
-                                    'sprintz': 4.681345926800472}},
+                        'results': {'arithmetic': 9.634654546527758,
+                                    'sprintz': 4.44420505858395}},
                        {'data set': 'raw parallel',
-                        'entropy': 5.165420541212975,
+                        'entropy': 5.367215667258702,
                         'mse': nan,
                         'original bitwidth': 14,
-                        'results': {'arithmetic': 7.453433208489389,
-                                    'sprintz': 9.352559300873908}},
+                        'results': {'arithmetic': 7.743579290664492,
+                                    'sprintz': 9.088055442315532}},
                        {'data set': 'noiseless parallel',
-                        'entropy': 4.523956317599315,
-                        'mse': 182584.2424469413,
+                        'entropy': 4.6401340470620385,
+                        'mse': 120704.99331430902,
                         'original bitwidth': 14,
-                        'results': {'arithmetic': 6.526841448189762,
-                                    'sprintz': 7.307116104868913}},
+                        'results': {'arithmetic': 6.695067264573991,
+                                    'sprintz': 7.193232776192417}},
                        {'data set': 'raw parallel noiseless',
-                        'entropy': 4.425737586143162,
-                        'mse': 182584.2424469413,
+                        'entropy': 4.611895650364981,
+                        'mse': 120704.99331430902,
                         'original bitwidth': 14,
-                        'results': {'arithmetic': 6.3865168539325845,
-                                    'sprintz': 5.069912609238452}},
+                        'results': {'arithmetic': 6.653974724826743,
+                                    'sprintz': 4.8927028128821854}},
                        {'data set': 'noise floor',
-                        'entropy': 0.5715887236005829,
-                        'mse': 175720.19205544042,
+                        'entropy': 0.5699333445339994,
+                        'mse': 175700.10332272615,
                         'original bitwidth': 14,
-                        'results': {'arithmetic': 0.8248698027142446,
-                                    'sprintz': 0.6899508704733969}}],
+                        'results': {'arithmetic': 0.8224784525124113,
+                                    'sprintz': 0.6886814507564213}}],
     'single peak': [{'data set': 'raw',
-                     'entropy': 5.48630268996592,
+                     'entropy': 5.47560112104185,
                      'mse': nan,
                      'original bitwidth': 14,
-                     'results': {'arithmetic': 7.916655654128618,
-                                 'sprintz': 10.174298214224255}},
+                     'results': {'arithmetic': 7.901240111650406,
+                                 'sprintz': 10.177583264924674}},
                     {'data set': 'noiseless',
-                     'entropy': 4.107150057001681,
-                     'mse': 454448.841720896,
+                     'entropy': 4.691933745341393,
+                     'mse': 79680.29503935747,
                      'original bitwidth': 14,
-                     'results': {'arithmetic': 5.9269589611475935,
-                                 'sprintz': 5.621125462039771}},
+                     'results': {'arithmetic': 6.770647817742003,
+                                 'sprintz': 7.432328792946276}},
                     {'data set': 'peaks stream',
-                     'entropy': 4.090807295619112,
+                     'entropy': 4.1056533398356265,
                      'mse': nan,
                      'original bitwidth': 12,
-                     'results': {'arithmetic': 5.901832407328433,
-                                 'sprintz': 3.6604870740888718}},
+                     'results': {'arithmetic': 5.9232328801200556,
+                                 'sprintz': 3.5419166399806103}},
                     {'data set': 'raw parallel',
-                     'entropy': 5.452328074898036,
+                     'entropy': 5.5671664963802865,
                      'mse': nan,
                      'original bitwidth': 14,
-                     'results': {'arithmetic': 7.8667528142628,
-                                 'sprintz': 9.60594772527099}},
+                     'results': {'arithmetic': 8.031904920846761,
+                                 'sprintz': 9.473555755438653}},
                     {'data set': 'noiseless parallel',
-                     'entropy': 4.272593181222412,
-                     'mse': 91556.35810940909,
+                     'entropy': 4.710701869022074,
+                     'mse': 61419.63561243244,
                      'original bitwidth': 14,
-                     'results': {'arithmetic': 6.1642052744871565,
-                                 'sprintz': 7.155972053641458}},
+                     'results': {'arithmetic': 6.796501584486886,
+                                 'sprintz': 7.621433818236833}},
                     {'data set': 'raw parallel noiseless',
-                     'entropy': 4.357639678294283,
-                     'mse': 91556.35810940909,
+                     'entropy': 4.84141802012826,
+                     'mse': 61419.63561243244,
                      'original bitwidth': 14,
-                     'results': {'arithmetic': 6.287573454123806,
-                                 'sprintz': 5.111697402989776}},
+                     'results': {'arithmetic': 6.984914817299002,
+                                 'sprintz': 6.029760181865077}},
                     {'data set': 'noise floor',
-                     'entropy': 0.16318698472011645,
-                     'mse': 171261.52315929063,
+                     'entropy': 0.1545529801093907,
+                     'mse': 171142.8291533023,
                      'original bitwidth': 14,
-                     'results': {'arithmetic': 0.2370218378094061,
-                                 'sprintz': 0.8184013709067056}}]}
+                     'results': {'arithmetic': 0.22459358490147174,
+                                 'sprintz': 0.821371374336872}}]}
 
 
 def get_raw_dataset(results: list):
@@ -106,6 +104,10 @@ def get_peaks_dataset(results: list):
         if val['data set'] == 'peaks stream':
             return val
     return None
+
+
+def save_figure(figure_name: str):
+    plt.savefig(figure_name, bbox_inches='tight', format=figure_name.split(sep=".")[1])
 
 
 def fig_raw_data_results(figure_name: str, res: dict):
@@ -126,7 +128,7 @@ def fig_raw_data_results(figure_name: str, res: dict):
     axs.set_xticks(index + bar_width / 2)
     axs.set_xticklabels(labels, rotation=45)
     axs.legend()
-    plt.savefig(figure_name, bbox_inches='tight')
+    save_figure(figure_name)
 
 
 def fig_peaks_data_results(figure_name: str, res: dict):
@@ -147,7 +149,7 @@ def fig_peaks_data_results(figure_name: str, res: dict):
     axs.set_xticks(index + bar_width / 2)
     axs.set_xticklabels(labels, rotation=45)
     axs.legend()
-    plt.savefig(figure_name, bbox_inches='tight')
+    save_figure(figure_name)
 
 
 def fig_dataset_results(figure_name: str, res: list):
@@ -166,25 +168,34 @@ def fig_dataset_results(figure_name: str, res: list):
     axs.set_xticks(index + bar_width / 2)
     axs.set_xticklabels(labels, rotation=45)
     axs.legend()
-    plt.savefig(figure_name, bbox_inches='tight')
+    save_figure(figure_name)
 
 
 def fig_mean_square_error(figure_name: str, res: dict):
-    labels = [entry['data set'] for entry in res[list(res.keys())[0]]]
+    real_data = res.copy()
+    for key, value in real_data.items():
+        real_data[key] = [x for x in value if x['data set'] != "raw" and x['data set'] != "peaks stream" and x['data set'] != "raw parallel"]
+    labels = [entry['data set'] for entry in real_data[list(real_data.keys())[0]]]
     index = np.arange(len(labels))
     bar_width = 0.2
-    datasets = list(res.keys())
+    datasets = list(real_data.keys())
+
     fig, axs = plt.subplots(1, 1)
     for idx, d in enumerate(datasets):
-        values = [val['mse'] for val in res[d]]
+        values = []
+        if d == "multiple peaks":
+            values = [val['mse']/6000 for val in real_data[d]]
+        elif d == "single peak":
+            values = [val["mse"]/600 for val in real_data[d]]
         axs.bar(index + idx * bar_width, values, bar_width, label=d)
-    axs.set_xlabel('Data Set')
-    axs.set_ylabel('Mean Square Error')
-    axs.set_title('Transformations MSE in comparison to raw data')
+    axs.set_xlabel('Rodzaj transformacji')
+    axs.set_ylabel('Znormalizowany błąd')
+    plt.yscale('log')
+    axs.set_title('Błąd transformacji danych')
     axs.set_xticks(index + bar_width / 2)
     axs.set_xticklabels(labels, rotation=45)
     axs.legend()
-    plt.savefig(figure_name, bbox_inches='tight')
+    save_figure(figure_name)
 
 
 def fig_example_oscyllogram(figure_name: str, figure_title: str, data: list):
@@ -193,7 +204,7 @@ def fig_example_oscyllogram(figure_name: str, figure_title: str, data: list):
     ax.set_xlabel('Numer próbki')
     ax.set_ylabel('Znormalizowana moc optyczna')
     ax.set_title(figure_title)
-    plt.savefig(figure_name, bbox_inches='tight')
+    save_figure(figure_name)
 
 
 def fig_denoising_process_example(figure_name: str, figure_title: str, data: list, denoised_data: list):
@@ -204,7 +215,7 @@ def fig_denoising_process_example(figure_name: str, figure_title: str, data: lis
     ax.set_xlabel('Numer próbki')
     ax.set_ylabel('Znormalizowana moc optyczna')
     ax.set_title(figure_title)
-    plt.savefig(figure_name, bbox_inches='tight')
+    save_figure(figure_name)
 
 
 def fig_noise_floor_process_example(figure_name: str, figure_title: str, data: list, denoised_data: list):
@@ -215,40 +226,41 @@ def fig_noise_floor_process_example(figure_name: str, figure_title: str, data: l
     ax.set_xlabel('Numer próbki')
     ax.set_ylabel('Znormalizowana moc optyczna')
     ax.set_title(figure_title)
-    plt.savefig(figure_name, bbox_inches='tight')
+    save_figure(figure_name)
+
 
 # Raw data results
-fig_raw_data_results("Figures/results_raw.png", data)
+fig_raw_data_results("Figures/results_raw.pdf", data)
 
 # Mean square error values
-fig_mean_square_error("Figures/mse.png", data)
+fig_mean_square_error("Figures/mse.pdf", data)
 
 # Lossy results for both datasets
 target_datasets = ['noiseless', 'raw parallel', 'noiseless parallel',
                    'raw parallel noiseless', 'noise floor']
-fig_dataset_results("Figures/results_wide_lossy.png",
+fig_dataset_results("Figures/results_wide_lossy.pdf",
                     [entry for entry in data['multiple peaks'] if entry['data set'] in target_datasets])
-fig_dataset_results("Figures/results_thin_lossy.png",
+fig_dataset_results("Figures/results_thin_lossy.pdf",
                     [entry for entry in data['single peak'] if entry['data set'] in target_datasets])
 
 # Results for peaks dataset
-fig_peaks_data_results("Figures/results_peaks.png", data)
+fig_peaks_data_results("Figures/results_peaks.pdf", data)
 
 # Example oscillogram for wide dataset
 wide_data = FbgData("C:/Users/norbert/PycharmProjects/data", 10000)
 data = wide_data.get_sample_with_index(wide_data.get_number_of_samples() // 2)
-fig_example_oscyllogram("Figures/wide_data_example.png", "Przykład oscylogramu z szerokiego zbioru danych", data)
+fig_example_oscyllogram("Figures/wide_data_example.pdf", "Przykład oscylogramu z szerokiego zbioru danych", data)
 
 # Example escillogram for thin dataset
 thin_data = DataFromJulek(1000)
 data = thin_data.get_sample_with_index(thin_data.get_number_of_samples() // 2)
-fig_example_oscyllogram("Figures/thin_data_example.png", "Przykład oscylogramu z wąskiego zbioru danych", data)
+fig_example_oscyllogram("Figures/thin_data_example.pdf", "Przykład oscylogramu z wąskiego zbioru danych", data)
 
 # Example of denoising process for thin dataset
 data_source = DataFromJulek(1000)
 data = data_source.get_sample_with_index(data_source.get_number_of_samples() // 2)
 denoised_data = denoise_data(data, 7)
-fig_denoising_process_example("Figures/thin_data_denoising.png", "Przykład procesu odszumania wąskiego zbioru danych",
+fig_denoising_process_example("Figures/thin_data_denoising.pdf", "Przykład procesu odszumania wąskiego zbioru danych",
                               data, denoised_data)
 
 # Example of noise floor method for thin dataset
@@ -257,13 +269,14 @@ data_noise_floor = data.copy()
 for x in range(len(data_noise_floor)):
     if data_noise_floor[x] < noise_level:
         data_noise_floor[x] = noise_level
-fig_noise_floor_process_example("Figures/thin_data_noise_floor.png", "Przykład procesu ustalenia poziomu tła dla wąskiego zbioru danych",
+fig_noise_floor_process_example("Figures/thin_data_noise_floor.pdf",
+                                "Przykład procesu ustalenia poziomu tła dla wąskiego zbioru danych",
                                 data, data_noise_floor)
 
 # Example of denoising process for wide dataset
 data = wide_data.get_sample_with_index(wide_data.get_number_of_samples() // 2)
 denoised_data = denoise_data(data, 30)
-fig_denoising_process_example("Figures/wide_data_denoising.png", "Przykład procesu odszumania szerokiego zbioru danych",
+fig_denoising_process_example("Figures/wide_data_denoising.pdf", "Przykład procesu odszumania szerokiego zbioru danych",
                               data, denoised_data)
 
 # Example of noise floor method for wide dataset
@@ -272,5 +285,6 @@ data_noise_floor = data.copy()
 for x in range(len(data_noise_floor)):
     if data_noise_floor[x] < noise_level:
         data_noise_floor[x] = noise_level
-fig_noise_floor_process_example("Figures/wide_data_noise_floor.png", "Przykład procesu ustalenia poziomu tła dla szerokiego zbioru danych",
+fig_noise_floor_process_example("Figures/wide_data_noise_floor.pdf",
+                                "Przykład procesu ustalenia poziomu tła dla szerokiego zbioru danych",
                                 data, data_noise_floor)

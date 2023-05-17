@@ -38,7 +38,7 @@ class FbgCompressionResults:
         self.decimation_rate = DEFAULT_DECIMATION_RATE
         self.noise_level_factor = DEFAULT_NOISE_LEVEL_FACTOR
 
-    def add_and_process_dataset(self, data_source: Data, data_source_dense: Data):
+    def add_and_process_dataset(self, data_source: Data, data_source_dense: Data, denoise_step: int):
         n_f = data_source.get_number_of_samples()
 
         for x in range(PARALEL_STREAMS):
@@ -47,13 +47,13 @@ class FbgCompressionResults:
             data_raw = [0] * n_f
             for i in range(n_f):
                 data = data_source.get_next_sample()
-                data_noiseless = [int(round(x)) for x in denoise_data(data)]
+                data_noiseless = [int(round(x)) for x in denoise_data(data, denoise_step)]
                 noiseless_data_raw[i] = data_noiseless[x]
                 data_raw[i] = data[x]
 
             self.process_parallel_raw(data_raw)
 
-            data_raw = [int(round(x)) for x in denoise_data(data_raw)]
+            data_raw = [int(round(x)) for x in denoise_data(data_raw, denoise_step)]
             self.result_raw_parallel_noiseless.process(data_raw)
             self.result_noiseless_parallel.append_mse(mse(data_raw, noiseless_data_raw))
             self.result_raw_parallel_noiseless.append_mse(mse(data_raw, noiseless_data_raw))
@@ -64,7 +64,7 @@ class FbgCompressionResults:
             data = data_source.get_sample_with_index(i)
             self.process_raw(data)
             self.process_noise_floor(data)
-            self.process_noiseless(data)
+            self.process_noiseless(data, denoise_step)
 
         self.process_peaks_stream(data_source_dense)
 
@@ -114,8 +114,8 @@ class FbgCompressionResults:
         self.result_noise_floor.append_mse(mse(data, data_noise_floor))
         self.result_noise_floor.process(data_noise_floor)
 
-    def process_noiseless(self, data: list):
-        data_noiseless = [int(round(x)) for x in denoise_data(data)]
+    def process_noiseless(self, data: list, denoise_step: int):
+        data_noiseless = [int(round(x)) for x in denoise_data(data, denoise_step)]
         self.result_noiseless.append_mse(mse(data, data_noiseless))
         self.result_noiseless.process(data_noiseless)
 
