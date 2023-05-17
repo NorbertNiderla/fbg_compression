@@ -4,7 +4,7 @@ struct FirePredictor {
     learn_shift: u32,
     bitwidth: u32,
     accumulator: u32,
-    delta: u32,
+    delta: i32,
 }
 
 impl FirePredictor {
@@ -12,8 +12,45 @@ impl FirePredictor {
         FirePredictor {
             learn_shift: ((learning_rate  as f64).ln() / LN_2).floor() as u32,
             bitwidth,
-            
+            accumulator: 0,
+            delta: 0,
         }
+    }
+
+    fn predict(&self, sample: u16) -> u16 {
+        let alpha = self.accumulator >> self.learn_shift;
+        let mut change: i32 = (alpha as i32) * self.delta;
+        if change > 0 {
+            change >>= self.bitwidth;
+        } else {
+            change = (-change) >> self.bitwidth;
+        }
+        sample + (change as u16)
+    }
+
+    fn train(&mut self, previous_sample: u16, sample: u16, error: u16) {
+        let gradient;
+        if error > 0 {
+            gradient = -error * self.delta;
+        } else {
+            gradient = error * self.delta;
+        }
+        self.accumulator -= gradient;
+        self.delta = (sample as i32) - (previous_sample as i32);
+    }
+
+    pub fn encode(&mut self, data: &Vec<u16>) -> Vec<i32> {
+        let mut prev_x = 0;
+        let mut output: Vec<i32> = Vec::new();
+
+        for sample in data.iter() {
+            let predicted_sample = self.predict(prev_x);
+            let err = sample - predicted_sample;
+            self.train(prev_x, sample, err);
+
+        }
+
+        output
     }
 }
 
