@@ -184,9 +184,9 @@ def fig_mean_square_error(figure_name: str, res: dict):
     for idx, d in enumerate(datasets):
         values = []
         if d == "multiple peaks":
-            values = [val['mse']/6000 for val in real_data[d]]
+            values = [val['mse']/6180 for val in real_data[d]]
         elif d == "single peak":
-            values = [val["mse"]/600 for val in real_data[d]]
+            values = [val["mse"]/612 for val in real_data[d]]
         axs.bar(index + idx * bar_width, values, bar_width, label=d)
     axs.set_xlabel('Rodzaj transformacji')
     axs.set_ylabel('Znormalizowany błąd')
