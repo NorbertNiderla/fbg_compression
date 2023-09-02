@@ -10,6 +10,11 @@ def mse(arr1: ndarray, arr2: ndarray) -> float:
     return mean([(x - y) ** 2 for x, y in zip(arr1, arr2)])
 
 
+def normalize_data(data: list) -> list:
+    m = max(data)
+    return [x / m for x in data]
+
+
 def dct_test_core(data: list, compression_ratio: float) -> float:
     time_series = np.array(data)
     dct_coefficients = dct(time_series, norm='ortho')
@@ -52,7 +57,6 @@ def main():
     axs.scatter([16 * x for x in ratios], errors, label="Szeroki zbiór danych")
     axs.set_xlabel('Średnia szerokość bitowa')
     axs.set_ylabel('Błąd MSE')
-    axs.set_title('Kompresja DCT')
     axs.grid(True)
     axs.legend()
     axs.set_yscale("log")
@@ -60,21 +64,25 @@ def main():
     plt.savefig("Figures/mse_dct.pdf", bbox_inches='tight', format="pdf")
 
     fig, axs = plt.subplots(1, 1)
-    axs.plot(data, label="Dane oryginalne")
-    axs.plot(dct_processed(data, 0.025), label="Dane po dekompresji")
-    axs.set_xlabel('Numer próbki')
+    normalized_data = [x / max(data) for x in data]
+    data_processed = dct_processed(data, 0.025)
+    normalized_data_processed = [x / max(data_processed) for x in data_processed]
+    axs.plot(normalized_data, label="Dane oryginalne")
+    axs.plot(normalized_data_processed, label="Dane po dekompresji")
+    axs.set_xlabel('Numer pomiaru')
     axs.set_ylabel('Znormalizowana moc optyczna')
-    axs.set_title('Kompresja DCT - zbiór szeroki')
     axs.grid(True)
     axs.legend()
     plt.savefig("Figures/dct_wide_example.pdf", bbox_inches='tight', format="pdf")
 
     fig, axs = plt.subplots(1, 1)
-    axs.plot(data_julek, label="Dane oryginalne")
-    axs.plot(dct_processed(data_julek, 0.25), label="Dane po dekompresji")
-    axs.set_xlabel('Numer próbki')
+    normalized_data_julek = normalize_data(data_julek)
+    data_julek_processed = dct_processed(data_julek, 0.25)
+    normalized_data_julek_processed = normalize_data(data_julek_processed)
+    axs.plot(normalized_data_julek, label="Dane oryginalne")
+    axs.plot(normalized_data_julek_processed, label="Dane po dekompresji")
+    axs.set_xlabel('Numer pomiaru')
     axs.set_ylabel('Znormalizowana moc optyczna')
-    axs.set_title('Kompresja DCT - zbiór wąski')
     axs.grid(True)
     axs.legend()
     plt.savefig("Figures/dct_thin_example.pdf", bbox_inches='tight', format="pdf")
