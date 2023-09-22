@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from Common.data import FbgData, DataFromJulek
 from denoise_data import denoise_data
 
+# Tutaj wklejane dane to jest output ze skryptu main.py :), uznałem za kontrproduktywne w jakiś sposób couplować oba skrypty
 data = {
     'Szeroki': [{'data set': 'Surowe',
                  'entropy': 5.977535351924411,
